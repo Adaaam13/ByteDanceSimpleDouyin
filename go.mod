@@ -1,6 +1,6 @@
-module github.com/RaymondCode/simple-demo
+module simple-demo
 
-go 1.17
+go 1.18
 
 require github.com/gin-gonic/gin v1.7.7
 
