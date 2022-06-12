@@ -1,7 +1,7 @@
 package main
 
 import (
-	"simple-demo/controller"
+	"simple-tiktok/controller"
 	"github.com/gin-gonic/gin"
 )
 
