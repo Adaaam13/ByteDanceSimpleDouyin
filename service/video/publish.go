@@ -53,8 +53,7 @@ func upload(file *multipart.FileHeader, username string, video_id uint) (string,
 		return "", "", err
 	}
 
-	coverUrl := ""
-	// todo
+	coverUrl := playUrl + "?x-oss-process=" + "video/snapshot,t_0,f_jpg,w_0,h_0"
 
 	return playUrl, coverUrl, nil
 }
