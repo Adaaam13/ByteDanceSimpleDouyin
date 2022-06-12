@@ -1,8 +1,10 @@
 package ossService
 
 import (
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"fmt"
+	"mime/multipart"
+
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 const (
@@ -29,15 +31,21 @@ func Create(bucketName string) error {
 	return nil
 }
 
-func Upload(fileName string, bucketName string, objectName string) (string, error) {
+func Upload(file *multipart.FileHeader, bucketName string, objectName string) (string, error) {
 	// 获取存储空间
 	bucket, err := OssClient.Bucket(bucketName)
 	if err != nil {
 		return "", err
 	}
 
+	src, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
 	// 带进度条的上传。
-	err = bucket.PutObjectFromFile(objectName, fileName, oss.Progress(&OssProgressListener{}))
+	err = bucket.PutObject(objectName, src, oss.Progress(&OssProgressListener{}))
 	if err != nil {
 		return "", err
 	}
