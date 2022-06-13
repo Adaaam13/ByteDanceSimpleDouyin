@@ -17,24 +17,9 @@ type UserListResponse struct {
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 	toUserIdStr := c.Query("to_user_id")
-	to_user_id, err := strconv.ParseUint(toUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	to_user_id, _ := strconv.Atoi(toUserIdStr)
 
 	actionType := c.Query("action_type")
 
@@ -66,24 +51,9 @@ func RelationAction(c *gin.Context) {
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 	userIdStr := c.Query("user_id")
-	user_id, err := strconv.ParseUint(userIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	user_id, _ := strconv.Atoi(userIdStr)
 
 	// 2. 关注列表
 	userInfos, err := followService.QueryFollowList(uint(user_id), uint(qUser_id))
@@ -107,24 +77,9 @@ func FollowList(c *gin.Context) {
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 	userIdStr := c.Query("user_id")
-	user_id, err := strconv.ParseUint(userIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	user_id, _ := strconv.Atoi(userIdStr)
 
 	// 2. 粉丝列表
 	userInfos, err := followService.QueryFollowerList(uint(user_id), uint(qUser_id))

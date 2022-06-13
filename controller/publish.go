@@ -17,15 +17,7 @@ type VideoListResponse struct {
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 
 	title := c.Query("title")
 
@@ -57,24 +49,9 @@ func Publish(c *gin.Context) {
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	// 1. 处理参数
-	userIdStr := c.Query("qUser_id")
-	user_id, err := strconv.ParseUint(userIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	userIdStr := c.Query("user_id")
+	user_id, _ := strconv.Atoi(userIdStr)
+	qUser_id := c.MustGet("qUser_id").(uint)
 
 	// 2. publishList服务
 	videos, err := videoService.QueryPublishList(uint(user_id), uint(qUser_id))

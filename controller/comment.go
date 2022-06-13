@@ -22,28 +22,10 @@ type CommentActionResponse struct {
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 
 	videoIdStr := c.Query("video_id")
-	video_id, err := strconv.ParseUint(videoIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
-
-	commentIdStr := c.Query("comment_id")
-	comment_id, err := strconv.ParseUint(commentIdStr, 10, 64)
+	video_id, err := strconv.Atoi(videoIdStr)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
@@ -68,16 +50,25 @@ func CommentAction(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
 				Comment: Comment{
-					Id: comment.Id,
-					User: User(comment.User),
-					Content: comment.Content,
+					Id:         comment.Id,
+					User:       User(comment.User),
+					Content:    comment.Content,
 					CreateDate: comment.CreateDate,
 				}})
 			return
 		}
 
 	case "2":
-		err := commentService.Uncomment(uint(video_id), uint(qUser_id), uint(comment_id))
+		commentIdStr := c.Query("comment_id")
+		comment_id, err := strconv.Atoi(commentIdStr)
+		if err != nil {
+			c.JSON(http.StatusOK, Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			})
+			return
+		}
+		err = commentService.Uncomment(uint(video_id), uint(qUser_id), uint(comment_id))
 		if err != nil {
 			c.JSON(http.StatusOK, Response{
 				StatusCode: 1,
@@ -96,15 +87,7 @@ func CommentAction(c *gin.Context) {
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
 	// 1. 处理参数
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	qUser_id := c.MustGet("qUser_id").(uint)
 
 	videoIdStr := c.Query("video_id")
 	video_id, err := strconv.ParseUint(videoIdStr, 10, 64)

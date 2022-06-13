@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"simple-tiktok/service/jwtService"
 
@@ -25,8 +24,6 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
-
-		log.Println("get token: ", token)
 
 		userClaims, err := jwtService.ParseToken(token)
 		if err != nil {

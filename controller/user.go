@@ -60,21 +60,8 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	// 1. 处理参数
 	userIdStr := c.Query("user_id")
-	user_id, err := strconv.ParseUint(userIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: err.Error()},
-		})
-		return
-	}
-	qUserIdStr := c.Query("qUser_id")
-	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: err.Error()},
-		})
-		return
-	}
+	user_id, _ := strconv.Atoi(userIdStr)
+	qUser_id := c.MustGet("qUser_id").(uint)
 
 	// 2. 查找用户信息
 	userInfo, err := userService.QueryUserInfo(uint(user_id), uint(qUser_id))
