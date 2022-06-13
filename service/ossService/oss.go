@@ -8,8 +8,8 @@ import (
 
 const (
 	endpoint        = "http://oss-cn-shenzhen.aliyuncs.com"
-	accessKeyId     = "LTAI5tEcxUQyx6feEWAmtRSA"
-	accessKeySecret = "LMERdR11kR3IutsMES2BBKeoa2qNlI"
+	accessKeyId     = ""
+	accessKeySecret = ""
 	endpointPostFix = ".oss-cn-shenzhen.aliyuncs.com"
 )
 
