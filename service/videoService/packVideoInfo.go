@@ -6,11 +6,11 @@ import (
 	"simple-tiktok/service/userService"
 )
 
-func PackVideoInfo(videos []*repository.Video, user_id uint) ([]service.VideoInfo, error) {
+func PackVideoInfo(videos []*repository.Video, qUser_id uint) ([]service.VideoInfo, error) {
 	var res []service.VideoInfo
 	for _, video := range videos {
 		// 1. 作者信息
-		userInfo, err := userService.QueryUserInfo(video.AuthorId, user_id)
+		userInfo, err := userService.QueryUserInfo(video.AuthorId, qUser_id)
 		if err != nil {
 			return nil, err
 		}
@@ -26,11 +26,11 @@ func PackVideoInfo(videos []*repository.Video, user_id uint) ([]service.VideoInf
 		}
 		// 4. 用户是否点赞
 		var isFav bool
-		if user_id == 0 { // 未登录用户
+		if qUser_id == 0 { // 未登录用户
 			isFav = false
 		} else { // 登录用户
 			var err error
-			isFav, err = repository.NewFavDaoInstance().IsFav(user_id, video.Id)
+			isFav, err = repository.NewFavDaoInstance().IsFav(qUser_id, video.Id)
 			if err != nil {
 				return nil, err
 			}
