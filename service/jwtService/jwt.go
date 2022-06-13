@@ -9,7 +9,7 @@ import (
 
 type UserClaims struct {
 	Username string `json:"username"`
-	UserId uint `json:"user_id"`
+	UserId   uint   `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -17,15 +17,19 @@ var signingKey = []byte("secret")
 const TokenExpireDuration = time.Hour * 24 * 14
 
 func GenToken(username string, userId uint) (string, error) {
-	uc := UserClaims {
+	if username == "" || userId == 0 {
+		return "", errors.New("无效用户名或用户id")
+	}
+
+	uc := UserClaims{
 		Username: username,
-		UserId: userId,
+		UserId:   userId,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Unix() + int64(TokenExpireDuration),
-			Issuer: "simple-tiktok",
+			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(),
+			Issuer:    "simple-tiktok",
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, uc)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, uc)
 	s, err := token.SignedString(signingKey)
 	if err != nil {
 		return "", err
