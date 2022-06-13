@@ -32,7 +32,13 @@ func Publish(file *multipart.FileHeader, title string, user_id uint) error {
 		return err
 	}
 
-	playUrl, coverUrl, err := upload(file, user.Username, video.Id)
+	videos, err := repository.NewVideoDaoInstance().GetVideosByAuthor(user_id)
+	if err != nil {
+		return err
+	}
+
+	var createBucket bool = len(videos) == 0
+	playUrl, coverUrl, err := upload(file, user.Username, video.Id, createBucket)
 	if err != nil {
 		_ = repository.NewVideoDaoInstance().DeleteVideo(video.Id)
 		return err
@@ -49,9 +55,16 @@ func Publish(file *multipart.FileHeader, title string, user_id uint) error {
 	return nil
 }
 
-func upload(file *multipart.FileHeader, username string, video_id uint) (string, string, error) {
+func upload(file *multipart.FileHeader, username string, video_id uint, createBucket bool) (string, string, error) {
 	bucketName := "simple-tiktok-" + username + "-bucket"
 	objectName := "video/" + strconv.FormatUint(uint64(video_id), 10) + "-" + file.Filename
+
+	if createBucket {
+		err := ossService.Create(bucketName)
+		if err != nil {
+			return "", "", err
+		}
+	}
 
 	playUrl, err := ossService.Upload(file, bucketName, objectName)
 	if err != nil {

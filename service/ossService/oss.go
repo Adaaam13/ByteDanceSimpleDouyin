@@ -1,7 +1,6 @@
 package ossService
 
 import (
-	"fmt"
 	"mime/multipart"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
@@ -9,8 +8,9 @@ import (
 
 const (
 	endpoint        = "http://oss-cn-shenzhen.aliyuncs.com"
-	accessKeyId     = ""
-	accessKeySecret = ""
+	accessKeyId     = "LTAI5tEcxUQyx6feEWAmtRSA"
+	accessKeySecret = "LMERdR11kR3IutsMES2BBKeoa2qNlI"
+	endpointPostFix = ".oss-cn-shenzhen.aliyuncs.com"
 )
 
 var OssClient *oss.Client
@@ -28,6 +28,11 @@ func Create(bucketName string) error {
 	if err != nil {
 		return err
 	}
+	// default public read
+	err = OssClient.SetBucketACL(bucketName, oss.ACLPublicRead)
+    if err != nil {
+		return err
+    }
 	return nil
 }
 
@@ -45,34 +50,11 @@ func Upload(file *multipart.FileHeader, bucketName string, objectName string) (s
 	defer src.Close()
 
 	// 带进度条的上传。
-	err = bucket.PutObject(objectName, src, oss.Progress(&OssProgressListener{}))
+	err = bucket.PutObject(objectName, src)
 	if err != nil {
 		return "", err
 	}
 
-	url := endpoint + "/" + bucketName + "/" + objectName
+	url := "https://" + bucketName + endpointPostFix + "/" + objectName
 	return url, nil
-}
-
-// 定义进度条监听器。
-type OssProgressListener struct {
-}
-
-// 定义进度变更事件处理函数。
-func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
-	switch event.EventType {
-	case oss.TransferStartedEvent:
-		fmt.Printf("Transfer Started, ConsumedBytes: %d, TotalBytes %d.\n",
-			event.ConsumedBytes, event.TotalBytes)
-	case oss.TransferDataEvent:
-		fmt.Printf("\rTransfer Data, ConsumedBytes: %d, TotalBytes %d, %d%%.",
-			event.ConsumedBytes, event.TotalBytes, event.ConsumedBytes*100/event.TotalBytes)
-	case oss.TransferCompletedEvent:
-		fmt.Printf("\nTransfer Completed, ConsumedBytes: %d, TotalBytes %d.\n",
-			event.ConsumedBytes, event.TotalBytes)
-	case oss.TransferFailedEvent:
-		fmt.Printf("\nTransfer Failed, ConsumedBytes: %d, TotalBytes %d.\n",
-			event.ConsumedBytes, event.TotalBytes)
-	default:
-	}
 }
