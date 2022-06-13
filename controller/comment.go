@@ -1,13 +1,17 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"simple-tiktok/service"
+	"simple-tiktok/service/commentService"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CommentListResponse struct {
 	Response
-	CommentList []Comment `json:"comment_list,omitempty"`
+	CommentList []service.CommentInfo `json:"comment_list,omitempty"`
 }
 
 type CommentActionResponse struct {
@@ -17,31 +21,114 @@ type CommentActionResponse struct {
 
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
-	token := c.Query("token")
-	actionType := c.Query("action_type")
+	// 1. 处理参数
+	qUserIdStr := c.Query("qUser_id")
+	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
 
-	if user, exist := usersLoginInfo[token]; exist {
-		if actionType == "1" {
-			text := c.Query("comment_text")
+	videoIdStr := c.Query("video_id")
+	video_id, err := strconv.ParseUint(videoIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+
+	commentIdStr := c.Query("comment_id")
+	comment_id, err := strconv.ParseUint(commentIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+
+	actionType := c.Query("action_type")
+	commentText := c.Query("comment_text")
+
+	// 2. 处理评论操作
+	switch actionType {
+	case "1":
+		comment, err := commentService.Comment(uint(qUser_id), uint(video_id), commentText)
+		if err != nil {
+			c.JSON(http.StatusOK, Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			})
+			return
+		} else {
 			c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
 				Comment: Comment{
-					Id:         1,
-					User:       user,
-					Content:    text,
-					CreateDate: "05-01",
+					Id: comment.Id,
+					User: User(comment.User),
+					Content: comment.Content,
+					CreateDate: comment.CreateDate,
 				}})
 			return
 		}
-		c.JSON(http.StatusOK, Response{StatusCode: 0})
-	} else {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+
+	case "2":
+		err := commentService.Uncomment(uint(video_id), uint(qUser_id), uint(comment_id))
+		if err != nil {
+			c.JSON(http.StatusOK, Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, Response{StatusCode: 0})
+			return
+		}
+
 	}
+	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 }
 
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
+	// 1. 处理参数
+	qUserIdStr := c.Query("qUser_id")
+	qUser_id, err := strconv.ParseUint(qUserIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+
+	videoIdStr := c.Query("video_id")
+	video_id, err := strconv.ParseUint(videoIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+
+	// 2. 获取评论列表
+	comments, err := commentService.QueryCommentList(uint(video_id), uint(qUser_id))
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+
+	// 3. 响应
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
-		CommentList: DemoComments,
+		CommentList: comments,
 	})
 }

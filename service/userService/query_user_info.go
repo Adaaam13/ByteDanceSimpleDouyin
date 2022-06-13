@@ -8,7 +8,7 @@ import (
 
 func QueryUserInfo(userId uint, qUserId uint) (*service.UserInfo, error) {
 
-	if userId == 0 || qUserId == 0 {
+	if userId == 0 {
 		return nil, errors.New("无效用户id")
 	}
 
@@ -31,9 +31,15 @@ func QueryUserInfo(userId uint, qUserId uint) (*service.UserInfo, error) {
 	}
 
 	// 4. 获取是否关注
-	isFollow, err := repository.NewFollowDaoInstance().IsFollow(qUserId, userId)
-	if err != nil {
-		return nil, err
+	var isFollow bool
+	if qUserId == 0 { // 未登录查询用户
+		isFollow = false
+	} else {
+		var err error
+		isFollow, err = repository.NewFollowDaoInstance().IsFollow(qUserId, userId)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &service.UserInfo{

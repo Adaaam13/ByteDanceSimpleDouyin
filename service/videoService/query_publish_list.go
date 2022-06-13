@@ -6,7 +6,7 @@ import (
 	"simple-tiktok/service"
 )
 
-func QueryPublishList(user_id uint) ([]*service.VideoInfo, error) {
+func QueryPublishList(user_id uint, qUser_id uint) ([]service.VideoInfo, error) {
 	if user_id == 0 {
 		return nil, errors.New("无效用户id")
 	}
@@ -16,7 +16,7 @@ func QueryPublishList(user_id uint) ([]*service.VideoInfo, error) {
 		return nil, err
 	}
 
-	res, err := PackVideoInfo(videos, user_id)
+	res, err := PackVideoInfo(videos, qUser_id)
 	if err != nil {
 		return nil, err
 	}

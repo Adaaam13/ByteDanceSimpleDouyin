@@ -6,7 +6,7 @@ import (
 	"simple-tiktok/service"
 )
 
-func QueryFavList(user_id uint) ([]*service.VideoInfo, error) {
+func QueryFavList(user_id uint, qUser_id uint) ([]service.VideoInfo, error) {
 	if user_id == 0 {
 		return nil, errors.New("无效用户id")
 	}
@@ -25,7 +25,7 @@ func QueryFavList(user_id uint) ([]*service.VideoInfo, error) {
 		videos = append(videos, video)
 	}
 
-	res, err := PackVideoInfo(videos, user_id)
+	res, err := PackVideoInfo(videos, qUser_id)
 	if err != nil {
 		return nil, err
 	}
