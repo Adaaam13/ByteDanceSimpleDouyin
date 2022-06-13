@@ -1,11 +1,16 @@
 package videoService
 
 import (
+	"errors"
 	"simple-tiktok/repository"
 	"simple-tiktok/service"
 )
 
 func QueryFavList(user_id uint) ([]*service.VideoInfo, error) {
+	if user_id == 0 {
+		return nil, errors.New("无效用户id")
+	}
+
 	favs, err := repository.NewFavDaoInstance().GetFavsByUserId(user_id)
 	if err != nil {
 		return nil, err

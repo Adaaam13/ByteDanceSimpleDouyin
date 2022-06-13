@@ -1,6 +1,7 @@
 package videoService
 
 import (
+	"errors"
 	"mime/multipart"
 	"simple-tiktok/repository"
 	"simple-tiktok/service/ossService"
@@ -9,6 +10,10 @@ import (
 )
 
 func Publish(file *multipart.FileHeader, title string, user_id uint) error {
+	if user_id == 0 {
+		return errors.New("无效用户id")
+	}
+
 	user, err := repository.NewUserDaoInstance().GetUserById(user_id)
 	if err != nil {
 		return err
@@ -47,7 +52,7 @@ func Publish(file *multipart.FileHeader, title string, user_id uint) error {
 func upload(file *multipart.FileHeader, username string, video_id uint) (string, string, error) {
 	bucketName := "simple-tiktok-" + username + "-bucket"
 	objectName := "video/" + strconv.FormatUint(uint64(video_id), 10) + "-" + file.Filename
-	
+
 	playUrl, err := ossService.Upload(file, bucketName, objectName)
 	if err != nil {
 		return "", "", err
