@@ -18,8 +18,7 @@ type VideoListResponse struct {
 func Publish(c *gin.Context) {
 	// 1. 处理参数
 	qUser_id := c.MustGet("qUser_id").(uint)
-
-	title := c.Query("title")
+	title := c.MustGet("title").(string)
 
 	data, err := c.FormFile("data")
 	if err != nil {
