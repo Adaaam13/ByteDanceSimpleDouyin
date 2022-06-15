@@ -5,7 +5,7 @@ import (
 	"simple-tiktok/service/jwtService"
 	"simple-tiktok/repository"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func UserRegisterService(username string, password string) (*string, *uint, error) {

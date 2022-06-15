@@ -10,7 +10,9 @@ type Comment struct {
 	Content    string `gorm:"not null"`
 	UserId     uint   `gorm:"not null"`
 	VideoId    uint   `gorm:"not null"`
-	CreateDate string  `gorm:"not null"`
+	CreateDate string `gorm:"not null"`
+	User       User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Video      Video  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type CommentDao struct{}

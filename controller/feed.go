@@ -14,7 +14,7 @@ import (
 type FeedResponse struct {
 	Response
 	VideoList []service.VideoInfo `json:"video_list,omitempty"`
-	NextTime  int64   `json:"next_time,omitempty"`
+	NextTime  int64               `json:"next_time,omitempty"`
 }
 
 // Feed same demo video list for every request
@@ -62,7 +62,6 @@ func Feed(c *gin.Context) {
 			NextTime:  time.Now().Unix(),
 		})
 	}
-
 
 	// 3. 响应
 	c.JSON(http.StatusOK, FeedResponse{

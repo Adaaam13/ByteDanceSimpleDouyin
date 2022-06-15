@@ -31,7 +31,7 @@ func NewUserDaoInstance() *UserDao {
 func (*UserDao) CreateUser(username string, password string) (*User, error) {
 	user := &User{CreateTime: time.Now().Unix(), Username: username, Password: password}
 	if err := db.Create(user).Error; err != nil {
-		return user, err
+		return nil, err
 	}
 	return user, nil
 }

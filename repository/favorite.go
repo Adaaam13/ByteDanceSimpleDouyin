@@ -3,12 +3,14 @@ package repository
 import (
 	"sync"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Favorite struct {
-	UserId  uint `gorm:"primaryKey;"`
-	VideoId uint `gorm:"primaryKey;"`
+	UserId  uint  `gorm:"index:idx_user_video,unique"`
+	VideoId uint  `gorm:"index:idx_user_video,unique"`
+	User    User  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Video   Video `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type FavDao struct{}

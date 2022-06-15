@@ -3,12 +3,14 @@ package repository
 import (
 	"sync"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Follow struct {
-	FollowerId uint `gorm:"not null"`
-	UserId  uint `gorm:"not null"`
+	FollowerId uint `gorm:"index:follower_user,unique"`
+	UserId     uint `gorm:"index:follower_user,unique"`
+	Follower   User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	User       User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type FollowDao struct{}
@@ -28,7 +30,7 @@ func NewFollowDaoInstance() *FollowDao {
 
 // Create
 func (*FollowDao) CreateFollow(follower_id uint, user_id uint) (*Follow, error) {
-	follow := &Follow{FollowerId:follower_id, UserId: user_id}
+	follow := &Follow{FollowerId: follower_id, UserId: user_id}
 	if err := db.Create(follow).Error; err != nil {
 		return follow, err
 	}
